@@ -1,7 +1,17 @@
 import io
 import os
+from pathlib import Path
 
 import boto3
+
+# Carrega .env da raiz do projeto
+_env_path = Path(__file__).parent.parent / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _key, _, _value = _line.partition("=")
+            os.environ.setdefault(_key.strip(), _value.strip())
 import pandas as pd
 import plotly.express as px
 import streamlit as st
