@@ -7,9 +7,9 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 BUCKET = "projeto-dados-cvm"
-BRONZE_PREFIX = "bronze"
-SILVER_PREFIX = "silver"
-GOLD_PREFIX = "gold"
+BRONZE_PREFIX = "informes-diario/bronze"
+SILVER_PREFIX = "informes-diario/silver"
+GOLD_PREFIX = "informes-diario/gold"
 
 # Campos obrigatórios conforme dicionário de dados da CVM
 EXPECTED_COLUMNS = {

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 CVM_BASE_URL = "https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/DADOS"
 BUCKET = "projeto-dados-cvm"
-BRONZE_PREFIX = "bronze"
+BRONZE_PREFIX = "informes-diario/bronze"
 
 
 def list_existing_files(bucket: str, prefix: str) -> set:

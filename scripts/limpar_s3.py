@@ -24,8 +24,15 @@ if _env_path.exists():
 BUCKET = os.environ.get("S3_BUCKET", "projeto-dados-cvm")
 REGION = os.environ.get("AWS_DEFAULT_REGION", "sa-east-1")
 
+PREFIXOS = {
+    "bronze":   ["informes-diario/bronze", "informacoes-cadastrais/bronze"],
+    "silver":   ["informes-diario/silver", "informacoes-cadastrais/silver"],
+    "gold":     ["informes-diario/gold",   "informacoes-cadastrais/gold"],
+    "enriched": ["informes-enriquecido/gold"],
+}
 
-def deletar_camada(s3, prefixo: str):
+
+def deletar_prefixo(s3, prefixo: str):
     paginator = s3.get_paginator("list_objects_v2")
     objetos = []
     for page in paginator.paginate(Bucket=BUCKET, Prefix=prefixo):
@@ -36,7 +43,6 @@ def deletar_camada(s3, prefixo: str):
         print(f"  Nenhum arquivo encontrado em {prefixo}/")
         return
 
-    # S3 aceita até 1000 objetos por chamada de delete
     for i in range(0, len(objetos), 1000):
         lote = objetos[i:i + 1000]
         s3.delete_objects(Bucket=BUCKET, Delete={"Objects": lote})
@@ -47,20 +53,18 @@ def deletar_camada(s3, prefixo: str):
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--camada", choices=["bronze", "silver", "gold"])
+    group.add_argument("--camada", choices=["bronze", "silver", "gold", "enriched"])
     group.add_argument("--tudo", action="store_true")
     args = parser.parse_args()
 
     s3 = boto3.client("s3", region_name=REGION)
 
-    if args.tudo:
-        camadas = ["bronze", "silver", "gold"]
-    else:
-        camadas = [args.camada]
+    camadas = ["bronze", "silver", "gold", "enriched"] if args.tudo else [args.camada]
 
     for camada in camadas:
         print(f"Apagando camada {camada}...")
-        deletar_camada(s3, camada)
+        for prefixo in PREFIXOS[camada]:
+            deletar_prefixo(s3, prefixo)
 
     print("\nConcluído.")
 
